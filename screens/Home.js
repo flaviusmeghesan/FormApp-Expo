@@ -1,10 +1,14 @@
 import React,{useState, useCallback, useEffect} from 'react';
-import { StyleSheet, FlatList, RefreshControl } from 'react-native';
+import { StyleSheet, Text, View, FlatList, RefreshControl } from 'react-native';
 import PalettePreview from '../components/PalettePreview';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 
 
-const Home = ({ navigation }) => {
+const Home = ({ navigation, route }) => {
+  const newColorPalette = route.params ? 
+  route.params.newColorPalette
+  : undefined;
   const [colorPalettes, setColorPalettes] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   
@@ -24,10 +28,15 @@ const Home = ({ navigation }) => {
   setIsRefreshing(true);
   await fetchColorPalettes();
   setIsRefreshing(false);
-      //setTimeout(()=>{
-    //setIsRefreshing(false)
+  //setTimeout(()=>{
+   //setIsRefreshing(false)
      // },1000);
   },[]);
+  useEffect(()=>{
+    if(newColorPalette){
+      setColorPalettes(palettes => [newColorPalette, ...palettes]);
+    }
+  },[newColorPalette]);
 
   return (
     <FlatList
@@ -43,6 +52,12 @@ const Home = ({ navigation }) => {
     )}
 
     refreshControl={<RefreshControl refreshing = {isRefreshing} onRefresh={handleRefresh} />}
+    ListHeaderComponent={
+    <TouchableOpacity onPress={()=>navigation.navigate('AddNewPaletteModal')}>
+      <View style={styles.button}>
+        <Text style={styles.buttonText}>Add a color palette</Text>
+        </View>
+    </TouchableOpacity>}
     />
   );
 };
@@ -51,7 +66,22 @@ const styles = StyleSheet.create({
   list: {
     padding: 10,
     backgroundColor: 'white'
-  }
+  },
+  buttonText:{
+    color: 'white',
+    fontSize: 16,
+  },
+  button:{
+    backgroundColor: 'grey',
+    width: 160,
+    height: 30,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+    
+    
+  } 
 });
 
 export default Home;
