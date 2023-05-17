@@ -1,43 +1,28 @@
-import React from 'react';
+import React,{useState, useCallback, useEffect} from 'react';
 import { StyleSheet, FlatList } from 'react-native';
 import PalettePreview from '../components/PalettePreview';
 
 
 
-const RAINBOW = [
-  { colorName: 'Red', hexCode: '#FF0000' },
-  { colorName: 'Orange', hexCode: '#FF7F00' },
-  { colorName: 'Yellow', hexCode: '#FFFF00' },
-  { colorName: 'Green', hexCode: '#00FF00' },
-  { colorName: 'Violet', hexCode: '#8B00FF' },
-];
-const BARCELONA = [
-  { colorName: 'Purplish', hexCode: '#A50043' },
-  { colorName: 'Blue', hexCode: '#004D98' },
-  { colorName: 'Orange', hexCode: '#EDBB01' },
-  { colorName: 'Yellow', hexCode: '#FFED03' },
-  { colorName: 'Red', hexCode: '#DB0030' },
-];
-const REAL_MADRID = [
-  { colorName: 'Yellow', hexCode: '#FEDD11' },
-  { colorName: 'Blue', hexCode: '#00529F' },
-  { colorName: 'White', hexCode: '#FFFFFF' },
-  { colorName: 'Pinkish', hexCode: '#EE324D' },
-  { colorName: 'Orange', hexCode: '#FEBD11' },
-];
-const COLOR_PALETTES=[
-  
-  { paletteName: 'Rainbow', colors: RAINBOW},
-  { paletteName: 'Barcelona', colors: BARCELONA },
-  { paletteName: 'Real Madrid', colors: REAL_MADRID},
-
-  
-];
 const Home = ({ navigation }) => {
+  const [colorPalettes, setColorPalettes] = useState([]);
+  
+  const fetchColorPalettes = useCallback(async ()=>{
+    const result = await fetch('https://color-palette-api.kadikraman.now.sh/palettes');
+    if (result.ok){
+      const palettes = await result.json();
+      setColorPalettes(palettes);
+
+    }
+  },[]);
+  useEffect(()=> {
+    fetchColorPalettes();
+  },[])
+  
   return (
     <FlatList
     style={styles.list}
-    data={COLOR_PALETTES}
+    data={colorPalettes}
     keyExtractor={item => item.paletteName}
     renderItem={({item})=>(
       <PalettePreview handlePress={() => {
